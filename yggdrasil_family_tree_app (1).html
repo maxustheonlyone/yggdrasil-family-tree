@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yggdrasil - The Eternal Family Realm</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts for Fantasy Aesthetics -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        fantasy: ['Cinzel Decorative', 'serif'],
+                        cinzel: ['Cinzel', 'serif'],
+                        garamond: ['Cormorant Garamond', 'Georgia', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        mythic: {
+                            gold: '#E0BB68',
+                            lightGold: '#F4D890',
+                            darkGold: '#A37C2A',
+                            emerald: '#1F4D3E',
+                            runeCyan: '#7CE8FF',
+                            parchment: '#F5EFE0',
+                            wood: '#2E1A0E'
+                        }
+                    },
+                    boxShadow: {
+                        'rune': '0 0 15px rgba(124, 232, 255, 0.5), 0 0 30px rgba(224, 187, 104, 0.3)',
+                        'gold-glow': '0 0 20px rgba(224, 187, 104, 0.6), inset 0 0 10px rgba(244, 216, 144, 0.8)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #070A0F;
+            color: #F5EFE0;
+            font-family: 'Cormorant Garamond', serif;
+            overflow: hidden;
+        }
+
+        /* Fast Cloud Spread / Parting Intro Animation */
+        #cloud-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, rgba(15, 23, 42, 0.7), rgba(2, 6, 23, 0.98));
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s;
+        }
+
+        .cloud-part-left {
+            position: absolute;
+            top: -10%;
+            bottom: -10%;
+            left: 0;
+            width: 65%;
+            background: radial-gradient(ellipse at left, rgba(220, 230, 242, 0.95) 0%, rgba(148, 163, 184, 0.85) 50%, rgba(15, 23, 42, 0) 100%),
+                        url('https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&q=80&w=1200');
+            background-size: cover;
+            filter: blur(14px) contrast(1.3);
+            transition: transform 0.8s cubic-bezier(0.7, 0, 0.2, 1);
+            transform-origin: left center;
+        }
+
+        .cloud-part-right {
+            position: absolute;
+            top: -10%;
+            bottom: -10%;
+            right: 0;
+            width: 65%;
+            background: radial-gradient(ellipse at right, rgba(220, 230, 242, 0.95) 0%, rgba(148, 163, 184, 0.85) 50%, rgba(15, 23, 42, 0) 100%),
+                        url('https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&q=80&w=1200');
+            background-size: cover;
+            filter: blur(14px) contrast(1.3);
+            transition: transform 0.8s cubic-bezier(0.7, 0, 0.2, 1);
+            transform-origin: right center;
+        }
+
+        #cloud-overlay.parted .cloud-part-left {
+            transform: translateX(-130%) scale(1.1);
+        }
+
+        #cloud-overlay.parted .cloud-part-right {
+            transform: translateX(130%) scale(1.1);
+        }
+
+        #cloud-overlay.parted {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* Oval Frame Node Styling */
+        .member-oval-frame {
+            position: absolute;
+            width: 140px;
+            height: 180px;
+            border-radius: 50% / 50%;
+            background: radial-gradient(circle, #FAF7EF 0%, #E2D7BF 100%);
+            border: 3.5px solid #A37C2A;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.8), 0 0 0 2px #1E1208, inset 0 0 10px rgba(163, 124, 42, 0.3);
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s, border-color 0.3s;
+            transform-origin: center center;
+            will-change: transform;
+        }
+
+        .member-oval-frame:hover, .member-oval-frame.highlighted {
+            transform: scale(1.22) translateY(-4px) !important;
+            border-color: #7CE8FF;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.9), 0 0 25px rgba(124, 232, 255, 0.9), inset 0 0 15px rgba(244, 216, 144, 0.6);
+            z-index: 50 !important;
+        }
+
+        /* Connecting String / Magic Thread Glow */
+        .magic-string-bg {
+            stroke-dasharray: 6 4;
+            animation: pulseGlow 3s infinite alternate ease-in-out, threadFlow 25s linear infinite;
+            cursor: pointer;
+            pointer-events: stroke;
+            transition: stroke 0.3s, stroke-width 0.3s;
+        }
+
+        .magic-string-hit {
+            cursor: pointer;
+            pointer-events: stroke;
+        }
+
+        .magic-string-hit:hover + .magic-string-bg,
+        .magic-string-bg:hover {
+            stroke: #7CE8FF !important;
+            stroke-width: 5.5px !important;
+            filter: drop-shadow(0 0 12px #7CE8FF) drop-shadow(0 0 24px #E0BB68);
+        }
+
+        @keyframes threadFlow {
+            to { stroke-dashoffset: -200; }
+        }
+
+        @keyframes pulseGlow {
+            0% { opacity: 0.7; filter: drop-shadow(0 0 5px #E0BB68); }
+            100% { opacity: 1; filter: drop-shadow(0 0 14px #7CE8FF); }
+        }
+
+        /* Canvas Viewport Transitions */
+        #tree-viewport {
+            transition: transform 0.2s ease-out;
+            will-change: transform;
+        }
+        #tree-viewport.dragging {
+            transition: none !important;
+        }
+
+        /* Pulsing Runes */
+        .rune-glow {
+            animation: runePulse 4s infinite ease-in-out alternate;
+        }
+        @keyframes runePulse {
+            0% { opacity: 0.3; filter: drop-shadow(0 0 2px #E0BB68); }
+            100% { opacity: 0.9; filter: drop-shadow(0 0 8px #7CE8FF); }
+        }
+    </style>
+</head>
+<body class="h-full select-none">
+
+    <!-- DRAMATIC INTRO FOG / CLOUD OVERLAY -->
+    <div id="cloud-overlay">
+        <div class="cloud-part-left"></div>
+        <div class="cloud-part-right"></div>
+
+        <!-- Central Magical Entry Button -->
+        <div class="relative z-10 text-center space-y-6 max-w-lg px-6">
+            <div class="w-24 h-24 mx-auto rounded-full bg-slate-900/90 border-2 border-mythic-gold flex items-center justify-center text-mythic-lightGold shadow-rune animate-pulse">
+                <span class="font-fantasy text-4xl">ᛦ</span>
+            </div>
+            
+            <div>
+                <h1 class="font-fantasy text-3xl sm:text-5xl text-mythic-lightGold tracking-wider drop-shadow-lg">
+                    YGGDRASIL
+                </h1>
+                <p class="font-cinzel text-xs sm:text-sm text-mythic-gold tracking-widest uppercase mt-2">
+                    The Sacred Family Realm
+                </p>
+            </div>
+
+            <p class="text-sm sm:text-base font-garamond italic text-slate-300 leading-relaxed">
+                Part the mystic clouds of time to reveal the eternal world tree and explore the sacred bonds connecting each soul.
+            </p>
+
+            <button onclick="partClouds()" class="px-8 py-3.5 bg-gradient-to-r from-mythic-darkGold via-mythic-gold to-mythic-darkGold hover:brightness-125 text-slate-950 font-cinzel font-black text-xs sm:text-sm uppercase tracking-widest rounded-full border-2 border-mythic-lightGold shadow-gold-glow transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 mx-auto cursor-pointer">
+                <i data-lucide="wind" class="w-4 h-4"></i>
+                <span>Part The Fog & Enter</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN APPLICATION WORKSPACE -->
+    <div class="relative h-full w-full flex flex-col justify-between">
+
+        <header class="w-full bg-slate-950/85 backdrop-blur-md border-b border-mythic-darkGold/50 px-4 sm:px-8 py-3 flex items-center justify-between z-40 shadow-2xl">
+            <!-- Realm Emblem -->
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-mythic-emerald/80 border-2 border-mythic-gold flex items-center justify-center text-mythic-lightGold shadow-md font-fantasy text-lg">
+                    ᛦ
+                </div>
+                <div>
+                    <h1 class="font-fantasy text-lg sm:text-xl text-mythic-lightGold tracking-wide">Yggdrasil Realm</h1>
+                    <p class="text-[10px] font-cinzel text-mythic-gold/80 uppercase tracking-widest hidden sm:block">Ancestral Tree & Thread Chronicles</p>
+                </div>
+            </div>
+
+            <!-- Search & Actions Bar -->
+            <div class="flex items-center space-x-3">
+                <!-- Search Box -->
+                <div class="relative w-40 sm:w-64">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 text-mythic-gold"></i>
+                    <input type="text" id="member-search" placeholder="Search member..." 
+                           class="w-full bg-slate-900/90 border border-mythic-darkGold/70 rounded-full pl-9 pr-4 py-1.5 text-xs text-mythic-parchment placeholder:text-slate-400 focus:outline-none focus:border-mythic-runeCyan transition-all font-sans">
+                </div>
+
+                <!-- Add Member Button -->
+                <button onclick="openAddMemberModal()" class="px-3 py-1.5 bg-mythic-emerald border border-mythic-gold hover:brightness-125 text-mythic-lightGold font-cinzel text-xs font-bold rounded-full flex items-center gap-1 shadow-md">
+                    <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+                    <span class="hidden sm:inline">Add Member</span>
+                </button>
+
+                <!-- Utility Controls -->
+                <button onclick="toggleAudio()" id="audio-btn" class="p-2 rounded-full bg-slate-900 border border-mythic-darkGold text-mythic-gold hover:text-mythic-runeCyan transition-all" title="Toggle Ambient Tone">
+                    <i data-lucide="volume-2" class="w-4 h-4"></i>
+                </button>
+                <button onclick="replayClouds()" class="p-2 rounded-full bg-slate-900 border border-mythic-darkGold text-mythic-gold hover:text-mythic-runeCyan transition-all" title="Replay Cloud Intro">
+                    <i data-lucide="cloud" class="w-4 h-4"></i>
+                </button>
+                <button onclick="resetCanvasView()" class="p-2 rounded-full bg-slate-900 border border-mythic-darkGold text-mythic-gold hover:text-mythic-runeCyan transition-all" title="Reset View">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </header>
+
+        <main id="canvas-wrapper" class="relative flex-1 w-full h-full overflow-hidden cursor-grab active:cursor-grabbing bg-[#05080E]">
+            
+            <!-- Particle Canvas for Floating Stardust / Leaves -->
+            <canvas id="particle-canvas" class="absolute inset-0 pointer-events-none z-10 opacity-70"></canvas>
+
+            <!-- Instructions Banner Overlay -->
+            <div class="absolute bottom-6 left-6 z-30 hidden sm:flex items-center space-x-3 bg-slate-950/80 border border-mythic-darkGold/80 px-4 py-2.5 rounded-2xl text-xs font-garamond text-mythic-parchment shadow-xl pointer-events-none backdrop-blur-md">
+                <i data-lucide="sparkles" class="w-4 h-4 text-mythic-runeCyan animate-pulse"></i>
+                <span>Click any <strong>Glowing String Thread</strong> to open the Relationship Memory Page. Click a <strong>Portrait</strong> for individual bio.</span>
+            </div>
+
+            <div id="tree-viewport" class="absolute top-0 left-0 w-[1400px] h-[1600px] origin-top-left transform-gpu">
+                
+                <!-- HAND-DRAWN FULL SVG YGGDRASIL TREE -->
+                <svg id="yggdrasil-svg-tree" class="absolute inset-0 w-full h-full z-0" viewBox="0 0 1400 1600" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <!-- Bark Gradient -->
+                        <linearGradient id="trunkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#3A2213" />
+                            <stop offset="40%" stop-color="#24140A" />
+                            <stop offset="100%" stop-color="#0F0804" />
+                        </linearGradient>
+
+                        <!-- Canopy Foliage Gradient -->
+                        <radialGradient id="foliageGrad" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#1F523E" stop-opacity="0.9" />
+                            <stop offset="60%" stop-color="#0F3325" stop-opacity="0.8" />
+                            <stop offset="100%" stop-color="#05140E" stop-opacity="0" />
+                        </radialGradient>
+
+                        <!-- Magical Root Glow Gradient -->
+                        <linearGradient id="rootGlowGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#A37C2A" stop-opacity="0.4" />
+                            <stop offset="50%" stop-color="#7CE8FF" stop-opacity="0.3" />
+                            <stop offset="100%" stop-color="#070A0F" stop-opacity="0" />
+                        </linearGradient>
+
+                        <!-- Filter Glow -->
+                        <filter id="runeFilter" x="-30%" y="-30%" width="160%" height="160%">
+                            <feGaussianBlur stdDeviation="4" result="blur" />
+                            <feMerge>
+                                <feMergeNode in="blur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+
+                    <!-- Background Ether Glow behind Yggdrasil -->
+                    <circle cx="700" cy="550" r="420" fill="url(#foliageGrad)" />
+
+                    <!-- SACRED CANOPY LEAF CLUSTERS -->
+                    <g opacity="0.85">
+                        <!-- Top Canopy -->
+                        <path d="M 400 300 Q 700 80 1000 300 Q 1100 500 700 580 Q 300 500 400 300 Z" fill="#133D2D" opacity="0.6" />
+                        <path d="M 350 350 Q 700 120 1050 350 Q 1150 550 700 620 Q 250 550 350 350 Z" fill="#0C281D" opacity="0.7" />
+                        
+                        <!-- Leaf Texture Circles -->
+                        <circle cx="450" cy="280" r="110" fill="#1A4A38" opacity="0.5" />
+                        <circle cx="950" cy="280" r="110" fill="#1A4A38" opacity="0.5" />
+                        <circle cx="700" cy="200" r="140" fill="#235E48" opacity="0.6" />
+                        <circle cx="580" cy="380" r="90" fill="#1F523E" opacity="0.7" />
+                        <circle cx="820" cy="380" r="90" fill="#1F523E" opacity="0.7" />
+                    </g>
+
+                    <!-- MAIN TRUNK & GNARLED BRANCHES -->
+                    <g stroke="url(#trunkGrad)" fill="none" stroke-linecap="round">
+                        <!-- Central Solid Trunk -->
+                        <path d="M 620 1200 C 640 900 600 750 640 550 C 670 400 700 300 700 180" stroke-width="75" />
+                        <path d="M 780 1200 C 760 900 800 750 760 550 C 730 400 700 300 700 180" stroke-width="75" />
+                        
+                        <!-- Trunk Fill Body -->
+                        <path d="M 610 1200 Q 640 850 650 550 Q 700 250 700 180 Q 700 250 750 550 Q 760 850 790 1200 Z" fill="url(#trunkGrad)" />
+
+                        <!-- Major Left Branches -->
+                        <path d="M 650 620 C 500 580 380 480 280 400" stroke-width="38" />
+                        <path d="M 640 520 C 480 440 380 320 280 220" stroke-width="32" />
+                        <path d="M 660 720 C 520 700 420 620 320 580" stroke-width="28" />
+
+                        <!-- Major Right Branches -->
+                        <path d="M 750 620 C 900 580 1020 480 1120 400" stroke-width="38" />
+                        <path d="M 760 520 C 920 440 1020 320 1120 220" stroke-width="32" />
+                        <path d="M 740 720 C 880 700 980 620 1080 580" stroke-width="28" />
+
+                        <!-- Sub-branches / Twigs -->
+                        <path d="M 380 480 C 320 420 280 380 200 380" stroke-width="16" />
+                        <path d="M 1020 480 C 1080 420 1120 380 1200 380" stroke-width="16" />
+                        <path d="M 480 440 C 420 360 400 280 350 200" stroke-width="18" />
+                        <path d="M 920 440 C 980 360 1000 280 1050 200" stroke-width="18" />
+                    </g>
+
+                    <!-- DEEP TWISTING ROOTS OF THE UNDERWORLD -->
+                    <g stroke="url(#trunkGrad)" fill="none" stroke-linecap="round">
+                        <!-- Main Root Strands -->
+                        <path d="M 640 1150 C 550 1250 450 1350 250 1450" stroke-width="42" />
+                        <path d="M 760 1150 C 850 1250 950 1350 1150 1450" stroke-width="42" />
+                        <path d="M 670 1180 C 620 1300 580 1400 520 1520" stroke-width="32" />
+                        <path d="M 730 1180 C 780 1300 820 1400 880 1520" stroke-width="32" />
+                        <path d="M 700 1200 L 700 1550" stroke-width="36" />
+                    </g>
+
+                    <!-- ROOT MIST GLOW -->
+                    <path d="M 200 1450 Q 700 1200 1200 1450 L 1200 1600 L 200 1600 Z" fill="url(#rootGlowGrad)" />
+
+                    <!-- RUNIC SIGILS INCRIBED ON THE TRUNK -->
+                    <g class="rune-glow" fill="none" stroke="#7CE8FF" stroke-width="3" filter="url(#runeFilter)">
+                        <!-- Fehu / Algiz / Yggdrasil Runes -->
+                        <path d="M 700 680 L 700 760 M 700 700 L 725 680 M 700 720 L 725 700" />
+                        <path d="M 700 800 L 700 870 M 675 820 L 700 840 L 725 820" />
+                        <path d="M 700 910 L 700 980 M 675 930 L 725 960 M 675 960 L 725 930" />
+                        <circle cx="700" cy="620" r="18" stroke="#E0BB68" />
+                    </g>
+                </svg>
+
+                <!-- SVG Glowing Relationship String Threads Overlay -->
+                <svg id="string-svg-layer" class="absolute inset-0 w-full h-full z-10 pointer-events-none">
+                    <defs>
+                        <filter id="stringGlow" x="-20%" y="-20%" width="140%" height="140%">
+                            <feGaussianBlur stdDeviation="3" result="blur" />
+                            <feMerge>
+                                <feMergeNode in="blur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    <g id="strings-group"></g>
+                </svg>
+
+                <!-- Interactive Member Oval Frame Layer -->
+                <div id="members-layer" class="absolute inset-0 z-20 pointer-events-none"></div>
+
+                <!-- String Badges Layer -->
+                <div id="badges-layer" class="absolute inset-0 z-30 pointer-events-none"></div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="w-full bg-slate-950/90 border-t border-mythic-darkGold/40 px-6 py-2 z-30 flex items-center justify-between text-[11px] font-cinzel text-mythic-gold/70">
+            <div class="flex items-center space-x-3">
+                <span>Sacred Lineage</span>
+                <span>•</span>
+                <span>Yggdrasil World Tree</span>
+            </div>
+            <div>
+                <span>Click relationship threads to view shared memory chronicles</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- DEDICATED RELATIONSHIP MEMORY PAGE / MODAL -->
+    <div id="modal-relationship-page" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 sm:p-8 bg-slate-950/92 backdrop-blur-xl transition-all duration-500 opacity-0 transform scale-95">
+        <div class="bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 border-2 border-mythic-gold rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-10 shadow-rune relative text-mythic-parchment">
+            
+            <!-- Close Button -->
+            <button onclick="closeRelationshipPage()" class="absolute top-6 right-6 w-10 h-10 rounded-full bg-slate-900 border border-mythic-gold text-mythic-gold hover:text-mythic-runeCyan flex items-center justify-center transition-colors z-20">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <!-- Sacred Header: The Connected Souls -->
+            <div class="border-b border-mythic-darkGold/60 pb-8 flex flex-col md:flex-row items-center justify-between gap-6">
+                
+                <div class="flex items-center space-x-4 sm:space-x-8">
+                    <!-- Soul 1 Avatar -->
+                    <div class="text-center group">
+                        <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 border-mythic-gold overflow-hidden shadow-gold-glow mx-auto mb-2 relative bg-amber-900/40">
+                            <img id="rel-soul1-img" src="" class="w-full h-full object-cover">
+                        </div>
+                        <h4 id="rel-soul1-name" class="font-fantasy text-sm sm:text-base text-mythic-lightGold">Soul 1</h4>
+                        <span id="rel-soul1-role" class="font-cinzel text-[10px] text-mythic-gold/80 uppercase tracking-widest block">Role</span>
+                    </div>
+
+                    <!-- Thread Connection Badge -->
+                    <div class="flex flex-col items-center justify-center">
+                        <div class="w-12 h-12 rounded-full bg-mythic-emerald/80 border border-mythic-runeCyan flex items-center justify-center text-mythic-runeCyan shadow-rune animate-pulse">
+                            <i data-lucide="link-2" class="w-6 h-6"></i>
+                        </div>
+                        <span id="rel-type-badge" class="font-cinzel text-[10px] font-bold text-mythic-runeCyan uppercase tracking-widest mt-2 px-3 py-0.5 rounded-full bg-slate-900 border border-mythic-runeCyan/50">
+                            SACRED BOND
+                        </span>
+                    </div>
+
+                    <!-- Soul 2 Avatar -->
+                    <div class="text-center group">
+                        <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 border-mythic-gold overflow-hidden shadow-gold-glow mx-auto mb-2 relative bg-amber-900/40">
+                            <img id="rel-soul2-img" src="" class="w-full h-full object-cover">
+                        </div>
+                        <h4 id="rel-soul2-name" class="font-fantasy text-sm sm:text-base text-mythic-lightGold">Soul 2</h4>
+                        <span id="rel-soul2-role" class="font-cinzel text-[10px] text-mythic-gold/80 uppercase tracking-widest block">Role</span>
+                    </div>
+                </div>
+
+                <!-- Title Info -->
+                <div class="text-center md:text-right space-y-1">
+                    <h2 id="rel-page-title" class="font-fantasy text-2xl sm:text-3xl text-mythic-lightGold drop-shadow">The Thread of Unity</h2>
+                    <p id="rel-page-subtitle" class="font-garamond italic text-sm text-slate-300">A chronicle of shared memories and timeless devotion across Yggdrasil.</p>
+                </div>
+            </div>
+
+            <!-- Memory Montage Gallery Section -->
+            <div class="py-8 space-y-6">
+                <div class="flex items-center justify-between border-b border-mythic-darkGold/30 pb-3">
+                    <h3 class="font-cinzel text-sm uppercase tracking-widest text-mythic-gold flex items-center gap-2">
+                        <i data-lucide="images" class="w-4 h-4 text-mythic-runeCyan"></i> Shared Memory Montage & Pictures
+                    </h3>
+                    <button onclick="openAddPhotoModal()" class="px-3.5 py-1.5 rounded-full bg-mythic-emerald/80 hover:bg-mythic-emerald text-mythic-lightGold font-cinzel text-xs font-bold border border-mythic-gold flex items-center gap-1.5 transition-all shadow-md">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Memory Photo
+                    </button>
+                </div>
+
+                <div id="rel-photos-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </div>
+
+            <!-- Shared Story Notes -->
+            <div class="bg-slate-900/80 border border-mythic-darkGold/60 rounded-2xl p-6 space-y-3 font-garamond">
+                <h4 class="font-cinzel text-xs uppercase tracking-widest text-mythic-gold flex items-center gap-2">
+                    <i data-lucide="scroll" class="w-4 h-4 text-mythic-gold"></i> Chronicled Bond Story
+                </h4>
+                <p id="rel-story-text" class="text-base text-mythic-parchment leading-relaxed italic first-letter:text-3xl first-letter:font-fantasy first-letter:text-mythic-lightGold first-letter:float-left first-letter:mr-2">
+                    Story memories will be detailed here.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MEMBER PROFILE MODAL -->
+    <div id="modal-member-profile" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
+        <div class="bg-slate-900 border-2 border-mythic-gold rounded-3xl max-w-md w-full p-6 shadow-rune relative text-mythic-parchment text-center">
+            <button onclick="closeModal('modal-member-profile')" class="absolute top-4 right-4 text-mythic-gold hover:text-mythic-runeCyan">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <div class="w-24 h-32 rounded-full border-4 border-mythic-gold overflow-hidden shadow-gold-glow mx-auto mb-4 bg-amber-100">
+                <img id="prof-img" src="" class="w-full h-full object-cover">
+            </div>
+
+            <span id="prof-title" class="font-cinzel text-[10px] font-bold text-mythic-runeCyan uppercase tracking-widest block">Role Title</span>
+            <h3 id="prof-name" class="font-fantasy text-2xl text-mythic-lightGold my-1">Member Name</h3>
+            <p id="prof-years" class="font-cinzel text-xs text-mythic-gold/80 mb-4">Lifespan / Generation</p>
+
+            <p id="prof-bio" class="font-garamond text-sm italic text-slate-300 bg-slate-950/60 p-4 rounded-xl border border-mythic-darkGold/40 text-left">
+                Bio details...
+            </p>
+        </div>
+    </div>
+
+    <!-- ADD MEMBER MODAL -->
+    <div id="modal-add-member" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
+        <div class="bg-slate-900 border-2 border-mythic-gold rounded-3xl max-w-md w-full p-6 shadow-rune relative text-mythic-parchment">
+            <button onclick="closeModal('modal-add-member')" class="absolute top-4 right-4 text-mythic-gold hover:text-mythic-runeCyan">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <h3 class="font-fantasy text-xl text-mythic-lightGold mb-4 flex items-center gap-2">
+                <i data-lucide="user-plus" class="w-5 h-5 text-mythic-gold"></i> Inscribe New Member
+            </h3>
+
+            <form onsubmit="handleAddMember(event)" class="space-y-3 font-sans text-xs">
+                <div>
+                    <label class="block font-cinzel text-mythic-gold mb-1">Full Name</label>
+                    <input type="text" id="add-mem-name" required placeholder="e.g. Erik Bloodaxe" class="w-full px-3 py-2 bg-slate-950 border border-mythic-darkGold rounded-xl text-mythic-parchment focus:outline-none focus:border-mythic-runeCyan">
+                </div>
+                <div>
+                    <label class="block font-cinzel text-mythic-gold mb-1">Role / Title</label>
+                    <input type="text" id="add-mem-role" required placeholder="e.g. Shieldbearer" class="w-full px-3 py-2 bg-slate-950 border border-mythic-darkGold rounded-xl text-mythic-parchment focus:outline-none focus:border-mythic-runeCyan">
+                </div>
+                <div>
+                    <label class="block font-cinzel text-mythic-gold mb-1">Lifespan / Era</label>
+                    <input type="text" id="add-mem-years" placeholder="e.g. 1920 – 1998" class="w-full px-3 py-2 bg-slate-950 border border-mythic-darkGold rounded-xl text-mythic-parchment focus:outline-none focus:border-mythic-runeCyan">
+                </div>
+                <div>
+                    <label class="block font-cinzel text-mythic-gold mb-1">Avatar Image URL</label>
+                    <input type="url" id="add-mem-avatar" required placeholder="https://..." class="w-full px-3 py-2 bg-slate-950 border border-mythic-darkGold rounded-xl text-mythic-parchment focus:outline-none focus:border-mythic-runeCyan">
+                </div>
+                <div>
+                    <label class="block font-cinzel text-mythic-gold mb-1">Position Realm</label>
+                    <select id="add-mem-realm" class="w-full px-3 py-2 bg-slate-950 border border-mythic-darkGold rounded-xl text-mythic-parchment focus:outline-none focus:border-mythic-runeCyan">
+                        <option value="canopy">Upper Canopy (Ancestors)</option>
+                        <option value="trunk">Midgard Trunk (Parents)</option>
+                        <option value="roots">Underworld Roots (Elders)</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-mythic-emerald border border-mythic-gold text-mythic-lightGold font-cinzel font-bold text-xs rounded-xl shadow-md hover:brightness-125 transition-all mt-2">
+                    Inscribe onto Tree
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ADD PHOTO MODAL -->
+    <div id="modal-add-photo" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
+        <div class="bg-slate-900 border-2 border-mythic-gold rounded-3xl max-w-sm w-full p-6 shadow-rune relative text-mythic-parchment">
+            <button onclick="closeModal('modal-add-photo')" class="absolute top-4 right-4 text-mythic-gold hover:text-mythic-runeCyan">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <h3 class="font-fantasy text-xl text-mythic-lightGold mb-4 flex items-center gap-2">
+                <i data-lucide="image-plus" class="w-5 h-5 text-mythic-gold"></i> Add Shared Memory
+            </h3>
+
+            <form onsubmit="handleAddPhoto(event)" class="space-y-4 font-sans text-xs">
+                <div>
+                    <label class="block font-cinzel text-mythic-gold mb-1">Photo Title</label>
+                    <input type="text" id="photo-title" required placeholder="e.g. Summer Solstice Gathering" class="w-full px-3 py-2 bg-slate-950 border border-mythic-darkGold rounded-xl text-mythic-parchment focus:outline-none focus:border-mythic-runeCyan">
+                </div>
+                <div>
+                    <label class="block font-cinzel text-mythic-gold mb-1">Image URL</label>
+                    <input type="url" id="photo-url" required placeholder="https://..." class="w-full px-3 py-2 bg-slate-950 border border-mythic-darkGold rounded-xl text-mythic-parchment focus:outline-none focus:border-mythic-runeCyan">
+                </div>
+                <div>
+                    <label class="block font-cinzel text-mythic-gold mb-1">Date / Era</label>
+                    <input type="text" id="photo-date" placeholder="e.g. Year 1945" class="w-full px-3 py-2 bg-slate-950 border border-mythic-darkGold rounded-xl text-mythic-parchment focus:outline-none focus:border-mythic-runeCyan">
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-mythic-emerald border border-mythic-gold text-mythic-lightGold font-cinzel font-bold text-xs rounded-xl shadow-md hover:brightness-125 transition-all">
+                    Inscribe Photo
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Audio Effects Synthesizer (Web Audio API)
+        let audioCtx = null;
+        let audioEnabled = false;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playMagicTone(freq = 440, duration = 0.4) {
+            if (!audioEnabled || !audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {}
+        }
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            if (audioEnabled) {
+                initAudio();
+                playMagicTone(523.25, 0.4);
+                document.getElementById('audio-btn').classList.add('bg-mythic-emerald', 'text-mythic-runeCyan');
+            } else {
+                document.getElementById('audio-btn').classList.remove('bg-mythic-emerald', 'text-mythic-runeCyan');
+            }
+        }
+
+        // Family Members Dataset positioned along SVG Yggdrasil Canvas
+        const members = [
+            { id: 'm1', name: 'Trần Thị Bé', role: 'Elder Patriarch', years: '1880', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=300', bio: 'Founder of the ancestral estate high in the mountain valleys.', x: 700, y: 100 },
+            { id: 'm2', name: 'Nguyễn Thị Phương Trang', role: 'Elder Matriarch', years: '1885', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300', bio: 'Kept the hearth fire burning and handed down folklore.', x: 500, y: 300 },
+            { id: 'm3', name: 'Nguyễn Thị Phương Mai', role: 'Paternal Grandfather', years: '1910', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300', bio: 'Craftsman who navigated northern coastal waters.', x: 600, y: 300 },
+            { id: 'm4', name: 'Khương Klinger', role: 'Paternal Grandmother', years: '1915', avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=300', bio: 'Gardener who planted the majestic oak groves.', x: 700, y: 300 },
+            { id: 'm5', name: 'Nguyễn Phương Đại', role: 'House Father', years: '1945 – 2018', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300', bio: 'Architect who preserved timber sanctuaries.', x: 800, y: 300 },
+            { id: 'm6', name: 'Husband', role: 'Patriarch Line', years: 'b. 1975', avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=300', bio: 'Chronicle writer and custodian of family records.', x: 580, y: 920 },
+            
+            { id: 'm7', name: 'Great Grandfather II', role: 'Maternal Great Elder', years: '1882 – 1958', avatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&q=80&w=300', bio: 'Scholar of runic scripts and star maps.', x: 950, y: 200 },
+            { id: 'm8', name: 'Great Grandmother II', role: 'Maternal Great Elder', years: '1888 – 1964', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=300', bio: 'Musician and harpist whose songs echoed across generations.', x: 1100, y: 220 },
+            { id: 'm9', name: 'Grandfather II', role: 'Maternal Grandfather', years: '1912 – 1988', avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=300', bio: 'Master woodcarver who fashioned enchanted furniture.', x: 1080, y: 560 },
+            { id: 'm10', name: 'Grandmother II', role: 'Maternal Grandmother', years: '1918 – 1995', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=300', bio: 'Herbalist who prepared remedies from tree bark.', x: 1220, y: 400 },
+            { id: 'm11', name: 'Mother', role: 'Matriarch Line', years: '1948 – 2021', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300', bio: 'Artist who painted portraits of the family tree.', x: 900, y: 720 },
+            { id: 'm12', name: 'Wife', role: 'Matriarch Line', years: 'b. 1978', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=300', bio: 'Protector of the garden and heritage chronicles.', x: 820, y: 920 }
+        ];
+
+        // Relationships dataset with connecting strings & photo montages
+        const relationships = [
+            {
+                id: 'r1', source: 'm1', target: 'm2', type: 'Spousal Union',
+                label: 'Patriarch & Matriarch',
+                story: 'A union sealed under the harvest moon of 1904. Together they built the foundational estate beneath the canopy of Yggdrasil.',
+                photos: [
+                    { title: 'The Wedding Day', date: 'October 1904', url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=600' },
+                    { title: 'First Fjord Voyage', date: 'Summer 1912', url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=600' }
+                ]
+            },
+            {
+                id: 'r2', source: 'm1', target: 'm3', type: 'Direct Lineage',
+                label: 'Father & Son',
+                story: 'Passing down compasses and mountain maps across the rugged northern valleys.',
+                photos: [
+                    { title: 'Woodworking Workshop', date: 'Autumn 1925', url: 'https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&q=80&w=600' }
+                ]
+            },
+            {
+                id: 'r3', source: 'm3', target: 'm4', type: 'Spousal Union',
+                label: 'Grandparents Bond',
+                story: 'Fifty golden years spent expanding the oak garden and raising vibrant children.',
+                photos: [
+                    { title: 'Golden Anniversary', date: 'June 1970', url: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=600' }
+                ]
+            },
+            {
+                id: 'r4', source: 'm3', target: 'm5', type: 'Direct Lineage',
+                label: 'Father & Son',
+                story: 'Architectural mentorship that shaped timber sanctuaries.',
+                photos: [
+                    { title: 'Building the Cabin', date: 'Summer 1962', url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=600' }
+                ]
+            },
+            {
+                id: 'r5', source: 'm5', target: 'm6', type: 'Direct Lineage',
+                label: 'Father & Son',
+                story: 'Entrusting the family chronicle diary to the next generation.',
+                photos: [
+                    { title: 'Mountain Summit Hike', date: 'July 1990', url: 'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?auto=format&fit=crop&q=80&w=600' }
+                ]
+            },
+            {
+                id: 'r6', source: 'm7', target: 'm8', type: 'Spousal Union',
+                label: 'Scholarly Union',
+                story: 'Bound by a mutual devotion to ancient myths and orchestral harp music.',
+                photos: [
+                    { title: 'Harp Recital in Garden', date: 'May 1915', url: 'https://images.unsplash.com/photo-1509114397022-ed747cca3f65?auto=format&fit=crop&q=80&w=600' }
+                ]
+            },
+            {
+                id: 'r7', source: 'm9', target: 'm10', type: 'Spousal Union',
+                label: 'Craft & Nature',
+                story: 'Where carved timber met fragrant herbs in a house full of laughter.',
+                photos: [
+                    { title: 'Harvest Feast', date: 'Autumn 1948', url: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&q=80&w=600' }
+                ]
+            },
+            {
+                id: 'r8', source: 'm9', target: 'm11', type: 'Direct Lineage',
+                label: 'Father & Daughter',
+                story: 'Inspirational art sessions beneath sunlit foliage.',
+                photos: [
+                    { title: 'Painting Session', date: 'Spring 1955', url: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&q=80&w=600' }
+                ]
+            },
+            {
+                id: 'r9', source: 'm6', target: 'm12', type: 'Sacred Marriage Thread',
+                label: 'Husband & Wife',
+                story: 'The central union connecting the two great boughs of Yggdrasil. Their devotion keeps the realm vibrant.',
+                photos: [
+                    { title: 'Forest Wedding Ceremony', date: 'September 2002', url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=600' },
+                    { title: 'Summer Solstice Gathering', date: 'June 2015', url: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=600' }
+                ]
+            },
+            {
+                id: 'r10', source: 'm1', target: 'm4', type: 'Direct Lineage',
+                label: 'Mother & Child',
+                story: 'The bond between Trần Thị Bé and Khương Klinger, representing the strength of family ties and tradition.',
+                photos: [
+                    { title: 'Family Gathering', date: 'May 1920', url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=600' }
+                ]
+            }
+        ];
+
+        let activeRelId = null;
+
+        // Viewport Drag & Zoom Logic
+        const viewport = document.getElementById('tree-viewport');
+        const wrapper = document.getElementById('canvas-wrapper');
+
+        let scale = 0.82;
+        let panX = (window.innerWidth - 1400 * scale) / 2;
+        let panY = 20;
+
+        let isDragging = false;
+        let startX = 0, startY = 0;
+
+        function updateTransform(smooth = true) {
+            if (!smooth) viewport.classList.add('dragging');
+            else viewport.classList.remove('dragging');
+            viewport.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+        }
+        updateTransform(true);
+
+        wrapper.addEventListener('pointerdown', (e) => {
+            if (e.target.closest('.member-oval-frame') || e.target.closest('.magic-string-badge')) return;
+            isDragging = true;
+            startX = e.clientX - panX;
+            startY = e.clientY - panY;
+            viewport.classList.add('dragging');
+        });
+
+        window.addEventListener('pointermove', (e) => {
+            if (!isDragging) return;
+            panX = e.clientX - startX;
+            panY = e.clientY - startY;
+            updateTransform(false);
+        });
+
+        window.addEventListener('pointerup', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            viewport.classList.remove('dragging');
+        });
+
+        function resetCanvasView() {
+            scale = 0.82;
+            panX = (window.innerWidth - 1400 * scale) / 2;
+            panY = 20;
+            updateTransform(true);
+            playMagicTone(600, 0.3);
+        }
+
+        // Render Connecting Threads & Oval Member Frame Nodes
+        function renderTree() {
+            const stringsGroup = document.getElementById('strings-group');
+            const membersLayer = document.getElementById('members-layer');
+            const badgesLayer = document.getElementById('badges-layer');
+
+            stringsGroup.innerHTML = '';
+            membersLayer.innerHTML = '';
+            badgesLayer.innerHTML = '';
+
+            // Render Threads
+            relationships.forEach(rel => {
+                const s = members.find(m => m.id === rel.source);
+                const t = members.find(m => m.id === rel.target);
+                if (!s || !t) return;
+
+                const x1 = s.x;
+                const y1 = s.y;
+                const x2 = t.x;
+                const y2 = t.y;
+
+                const midX = (x1 + x2) / 2;
+                const midY = (y1 + y2) / 2;
+
+                // Hit Line (Thicker transparent stroke for easy touch/mouse targeting)
+                const hitLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                hitLine.setAttribute('x1', x1);
+                hitLine.setAttribute('y1', y1);
+                hitLine.setAttribute('x2', x2);
+                hitLine.setAttribute('y2', y2);
+                hitLine.setAttribute('stroke', 'transparent');
+                hitLine.setAttribute('stroke-width', '24');
+                hitLine.setAttribute('class', 'magic-string-hit');
+                hitLine.onclick = () => openRelationshipPage(rel.id);
+                stringsGroup.appendChild(hitLine);
+
+                // Visible Glowing Thread
+                const bgLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                bgLine.setAttribute('x1', x1);
+                bgLine.setAttribute('y1', y1);
+                bgLine.setAttribute('x2', x2);
+                bgLine.setAttribute('y2', y2);
+                bgLine.setAttribute('stroke', rel.type.includes('Marriage') ? '#E0BB68' : '#7CE8FF');
+                bgLine.setAttribute('stroke-width', '3.5');
+                bgLine.setAttribute('class', 'magic-string-bg');
+                bgLine.setAttribute('filter', 'url(#stringGlow)');
+                bgLine.onclick = () => openRelationshipPage(rel.id);
+                stringsGroup.appendChild(bgLine);
+
+                // Thread Badge Icon Marker
+                const badge = document.createElement('div');
+                badge.className = 'absolute pointer-events-auto cursor-pointer magic-string-badge transform hover:scale-125 transition-transform z-30';
+                badge.style.left = `${midX - 14}px`;
+                badge.style.top = `${midY - 14}px`;
+                badge.onclick = () => openRelationshipPage(rel.id);
+                badge.innerHTML = `
+                    <div class="w-7 h-7 rounded-full bg-slate-900 border-2 border-mythic-gold text-mythic-lightGold shadow-rune flex items-center justify-center hover:bg-mythic-emerald transition-colors" title="${rel.label}">
+                        <i data-lucide="${rel.type.includes('Marriage') ? 'heart' : 'sparkles'}" class="w-3.5 h-3.5 fill-current"></i>
+                    </div>
+                `;
+                badgesLayer.appendChild(badge);
+            });
+
+            // Render Oval Member Frames
+            members.forEach(m => {
+                const node = document.createElement('div');
+                node.id = `node-${m.id}`;
+                node.className = 'member-oval-frame pointer-events-auto flex flex-col items-center justify-center p-2 text-center';
+                node.style.left = `${m.x - 70}px`;
+                node.style.top = `${m.y - 90}px`;
+                node.onclick = () => openMemberProfile(m.id);
+
+                node.innerHTML = `
+                    <div class="w-12 h-14 rounded-full border border-mythic-darkGold overflow-hidden shadow-inner mb-1 bg-amber-100/50">
+                        <img src="${m.avatar}" class="w-full h-full object-cover">
+                    </div>
+                    <h4 class="font-fantasy font-bold text-[10px] text-slate-900 leading-none truncate w-full">${m.name}</h4>
+                    <span class="font-garamond text-[9px] text-amber-900 font-bold italic truncate w-full">${m.years}</span>
+                `;
+                membersLayer.appendChild(node);
+            });
+
+            lucide.createIcons();
+        }
+
+        // Open Dedicated Relationship Memory Page
+        function openRelationshipPage(relId) {
+            const rel = relationships.find(r => r.id === relId);
+            if (!rel) return;
+            activeRelId = relId;
+
+            playMagicTone(880, 0.5);
+
+            const s1 = members.find(m => m.id === rel.source);
+            const s2 = members.find(m => m.id === rel.target);
+
+            document.getElementById('rel-soul1-img').src = s1 ? s1.avatar : '';
+            document.getElementById('rel-soul1-name').textContent = s1 ? s1.name : 'Unknown';
+            document.getElementById('rel-soul1-role').textContent = s1 ? s1.role : '';
+
+            document.getElementById('rel-soul2-img').src = s2 ? s2.avatar : '';
+            document.getElementById('rel-soul2-name').textContent = s2 ? s2.name : 'Unknown';
+            document.getElementById('rel-soul2-role').textContent = s2 ? s2.role : '';
+
+            document.getElementById('rel-type-badge').textContent = rel.type.toUpperCase();
+            document.getElementById('rel-page-title').textContent = rel.label;
+            document.getElementById('rel-story-text').textContent = rel.story;
+
+            const grid = document.getElementById('rel-photos-grid');
+            grid.innerHTML = '';
+
+            if (!rel.photos || rel.photos.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-8 text-center text-slate-400 font-garamond italic">
+                        No photos inscribed in this thread memory yet. Click "Add Memory Photo" to upload.
+                    </div>
+                `;
+            } else {
+                rel.photos.forEach(p => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-slate-900/90 border border-mythic-darkGold/60 rounded-2xl p-3 shadow-lg hover:border-mythic-gold transition-all group';
+                    card.innerHTML = `
+                        <div class="h-40 rounded-xl overflow-hidden mb-2 border border-slate-800 relative bg-amber-950/30">
+                            <img src="${p.url}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        </div>
+                        <h5 class="font-fantasy text-xs text-mythic-lightGold">${p.title}</h5>
+                        <span class="font-cinzel text-[10px] text-mythic-gold/70 block">${p.date}</span>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+
+            const modal = document.getElementById('modal-relationship-page');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0', 'scale-95');
+            }, 10);
+        }
+
+        function closeRelationshipPage() {
+            const modal = document.getElementById('modal-relationship-page');
+            modal.classList.add('opacity-0', 'scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function openMemberProfile(memId) {
+            const m = members.find(mem => mem.id === memId);
+            if (!m) return;
+
+            playMagicTone(440, 0.3);
+
+            document.getElementById('prof-img').src = m.avatar;
+            document.getElementById('prof-name').textContent = m.name;
+            document.getElementById('prof-title').textContent = m.role;
+            document.getElementById('prof-years').textContent = m.years;
+            document.getElementById('prof-bio').textContent = m.bio;
+
+            document.getElementById('modal-member-profile').classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function openAddMemberModal() {
+            document.getElementById('modal-add-member').classList.remove('hidden');
+        }
+
+        function handleAddMember(e) {
+            e.preventDefault();
+            const name = document.getElementById('add-mem-name').value;
+            const role = document.getElementById('add-mem-role').value;
+            const years = document.getElementById('add-mem-years').value || 'Present';
+            const avatar = document.getElementById('add-mem-avatar').value;
+            const realm = document.getElementById('add-mem-realm').value;
+
+            let x = 700;
+            let y = 600;
+
+            if (realm === 'canopy') {
+                x = 250 + Math.random() * 900;
+                y = 180 + Math.random() * 200;
+            } else if (realm === 'trunk') {
+                x = 350 + Math.random() * 700;
+                y = 650 + Math.random() * 250;
+            } else if (realm === 'roots') {
+                x = 300 + Math.random() * 800;
+                y = 1250 + Math.random() * 200;
+            }
+
+            const newId = `m${members.length + 1}`;
+            members.push({ id: newId, name, role, years, avatar, bio: `${role} inscribed upon Yggdrasil.`, x, y });
+
+            // Connect to central parent if available
+            if (members.length > 1) {
+                const source = members[members.length - 2].id;
+                relationships.push({
+                    id: `r${relationships.length + 1}`,
+                    source: source,
+                    target: newId,
+                    type: 'Sacred Lineage',
+                    label: `${role} Connection`,
+                    story: 'A new thread tied across the sacred boughs of Yggdrasil.',
+                    photos: []
+                });
+            }
+
+            closeModal('modal-add-member');
+            renderTree();
+            playMagicTone(700, 0.4);
+        }
+
+        function openAddPhotoModal() {
+            document.getElementById('modal-add-photo').classList.remove('hidden');
+        }
+
+        function handleAddPhoto(e) {
+            e.preventDefault();
+            if (!activeRelId) return;
+
+            const title = document.getElementById('photo-title').value;
+            const url = document.getElementById('photo-url').value;
+            const date = document.getElementById('photo-date').value || 'Ancient Era';
+
+            const rel = relationships.find(r => r.id === activeRelId);
+            if (rel) {
+                if (!rel.photos) rel.photos = [];
+                rel.photos.push({ title, date, url });
+            }
+
+            closeModal('modal-add-photo');
+            openRelationshipPage(activeRelId);
+        }
+
+        // Part Cloud Fog Animation
+        function partClouds() {
+            playMagicTone(300, 0.8);
+            document.getElementById('cloud-overlay').classList.add('parted');
+        }
+
+        function replayClouds() {
+            document.getElementById('cloud-overlay').classList.remove('parted');
+        }
+
+        // Search highlight
+        document.getElementById('member-search').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            document.querySelectorAll('.member-oval-frame').forEach(el => el.classList.remove('highlighted'));
+
+            if (!query) return;
+
+            const match = members.find(m => m.name.toLowerCase().includes(query) || m.role.toLowerCase().includes(query));
+            if (match) {
+                scale = 1.0;
+                panX = (window.innerWidth / 2) - match.x * scale;
+                panY = (window.innerHeight / 2) - match.y * scale;
+                updateTransform(true);
+
+                const node = document.getElementById(`node-${match.id}`);
+                if (node) node.classList.add('highlighted');
+            }
+        });
+
+        // Background Particle Dust Canvas Effect
+        const particleCanvas = document.getElementById('particle-canvas');
+        const ctx = particleCanvas.getContext('2d');
+        let particles = [];
+
+        function resizeParticleCanvas() {
+            particleCanvas.width = window.innerWidth;
+            particleCanvas.height = window.innerHeight;
+        }
+        resizeParticleCanvas();
+        window.addEventListener('resize', resizeParticleCanvas);
+
+        for (let i = 0; i < 50; i++) {
+            particles.push({
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                r: Math.random() * 2.2 + 0.5,
+                dx: (Math.random() - 0.5) * 0.4,
+                dy: -Math.random() * 0.5 - 0.2,
+                alpha: Math.random() * 0.8 + 0.2
+            });
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+            particles.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(224, 187, 104, ${p.alpha})`;
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = '#7CE8FF';
+                ctx.fill();
+
+                p.x += p.dx;
+                p.y += p.dy;
+
+                if (p.y < 0) p.y = particleCanvas.height;
+                if (p.x < 0) p.x = particleCanvas.width;
+                if (p.x > particleCanvas.width) p.x = 0;
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        // Initialize Application
+        renderTree();
+        animateParticles();
+    </script>
+</body>
+</html>
