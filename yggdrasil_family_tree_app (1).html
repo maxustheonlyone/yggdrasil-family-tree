@@ -266,11 +266,16 @@
                 <i data-lucide="sparkles" class="w-4 h-4 text-mythic-runeCyan animate-pulse"></i>
                 <span>Click any <strong>Glowing String Thread</strong> to open the Relationship Memory Page. Click a <strong>Portrait</strong> for individual bio.</span>
             </div>
+            <!-- Floating zoom buttons -->
+            <div class="absolute top-4 right-4 z-50 flex flex-col gap-2 bg-slate-900/90 border border-amber-500/30 p-2 rounded-xl text-amber-100 shadow-xl backdrop-blur">
+    <button id="zoom-in" class="w-10 h-10 hover:bg-amber-500/20 rounded-lg flex items-center justify-center font-bold text-xl">+</button>
+    <button id="zoom-reset" class="w-10 h-10 hover:bg-amber-500/20 rounded-lg flex items-center justify-center font-bold text-xs" title="Reset zoom to fit">82%</button>
+    <button id="zoom-out" class="w-10 h-10 hover:bg-amber-500/20 rounded-lg flex items-center justify-center font-bold text-xl">−</button>
+  </div>
+                        <div id="tree-viewport" class="absolute top-0 left-0 w-[2000px] h-[2200px] origin-top-left transform-gpu pointer-events-auto">
 
-            <div id="tree-viewport" class="absolute top-0 left-0 w-[1400px] h-[1600px] origin-top-left transform-gpu">
-                
                 <!-- HAND-DRAWN FULL SVG YGGDRASIL TREE -->
-                <svg id="yggdrasil-svg-tree" class="absolute inset-0 w-full h-full z-0" viewBox="0 0 1400 1600" xmlns="http://www.w3.org/2000/svg">
+                <svg id="yggdrasil-svg-tree" class="absolute inset-0 w-full h-full z-0" viewBox="0 0 2000 2200" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                         <!-- Bark Gradient -->
                         <linearGradient id="trunkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -382,7 +387,6 @@
                     </defs>
                     <g id="strings-group"></g>
                 </svg>
-
                 <!-- Interactive Member Oval Frame Layer -->
                 <div id="members-layer" class="absolute inset-0 z-20 pointer-events-none"></div>
 
@@ -616,19 +620,24 @@
 
         // Family Members Dataset positioned along SVG Yggdrasil Canvas
         const members = [
-            { id: 'm1', name: 'Trần Thị Bé', role: 'Elder Patriarch', years: '1880', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=300', bio: 'Founder of the ancestral estate high in the mountain valleys.', x: 700, y: 100 },
-            { id: 'm2', name: 'Nguyễn Thị Phương Trang', role: 'Elder Matriarch', years: '1885', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300', bio: 'Kept the hearth fire burning and handed down folklore.', x: 500, y: 300 },
-            { id: 'm3', name: 'Nguyễn Thị Phương Mai', role: 'Paternal Grandfather', years: '1910', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300', bio: 'Craftsman who navigated northern coastal waters.', x: 600, y: 300 },
-            { id: 'm4', name: 'Khương Klinger', role: 'Paternal Grandmother', years: '1915', avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=300', bio: 'Gardener who planted the majestic oak groves.', x: 700, y: 300 },
-            { id: 'm5', name: 'Nguyễn Phương Đại', role: 'House Father', years: '1945 – 2018', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300', bio: 'Architect who preserved timber sanctuaries.', x: 800, y: 300 },
-            { id: 'm6', name: 'Husband', role: 'Patriarch Line', years: 'b. 1975', avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=300', bio: 'Chronicle writer and custodian of family records.', x: 580, y: 920 },
-            
-            { id: 'm7', name: 'Great Grandfather II', role: 'Maternal Great Elder', years: '1882 – 1958', avatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&q=80&w=300', bio: 'Scholar of runic scripts and star maps.', x: 950, y: 200 },
-            { id: 'm8', name: 'Great Grandmother II', role: 'Maternal Great Elder', years: '1888 – 1964', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=300', bio: 'Musician and harpist whose songs echoed across generations.', x: 1100, y: 220 },
-            { id: 'm9', name: 'Grandfather II', role: 'Maternal Grandfather', years: '1912 – 1988', avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=300', bio: 'Master woodcarver who fashioned enchanted furniture.', x: 1080, y: 560 },
-            { id: 'm10', name: 'Grandmother II', role: 'Maternal Grandmother', years: '1918 – 1995', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=300', bio: 'Herbalist who prepared remedies from tree bark.', x: 1220, y: 400 },
-            { id: 'm11', name: 'Mother', role: 'Matriarch Line', years: '1948 – 2021', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300', bio: 'Artist who painted portraits of the family tree.', x: 900, y: 720 },
-            { id: 'm12', name: 'Wife', role: 'Matriarch Line', years: 'b. 1978', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=300', bio: 'Protector of the garden and heritage chronicles.', x: 820, y: 920 }
+            { id: 'm1', name: 'Trần Thị Bé', role: 'Elder Patriarch', years: '1880', avatar: 'binvaut.jpg', bio: 'Founder of the ancestral estate high in the mountain valleys.', x: 700, y: 100 },
+            { id: 'm2', name: 'Nguyễn Thị Phương Trang', role: 'Elder Matriarch', years: '1885', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300', bio: 'Kept the hearth fire burning and handed down folklore.', x: 100, y: 300 },
+            { id: 'm3', name: 'Nguyễn Thị Phương Mai', role: 'Paternal Grandfather', years: '1910', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300', bio: 'Craftsman who navigated northern coastal waters.', x: 400, y: 300 },
+            { id: 'm4', name: 'Khương Klingler', role: 'Paternal Grandmother', years: '1915', avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=300', bio: 'Gardener who planted the majestic oak groves.', x: 700, y: 300 },
+            { id: 'm5', name: 'Nguyễn Phương Đại', role: 'House Father', years: '1945 – 2018', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300', bio: 'Architect who preserved timber sanctuaries.', x: 1100, y: 300 },
+            { id: 'm6', name: 'Ngô Hoàng Lâm', role: 'Patriarch Line', years: 'b. 1975', avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=300', bio: 'Chronicle writer and custodian of family records.', x: 580, y: 920 },
+            { id: 'm7', name: 'Huỳnh Công Anh Duy', role: 'Next Generation', years: 'b. 2005', avatar: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&q=80&w=300', bio: 'Aspiring storyteller and nature enthusiast.', x: 500, y: 1100 },
+            { id: 'm8', name: 'Huỳnh Công Anh Viên', role: 'Next Generation', years: 'b. 2008', avatar: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&q=80&w=300', bio: 'Loves to explore the hidden groves and streams.', x: 700, y: 1100 },
+            { id: 'm9', name: 'Ngô Hoàng Long', role: 'Maternal Great Elder', years: '1882 – 1958', avatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&q=80&w=300', bio: 'Scholar of runic scripts and star maps.', x: 950, y: 200 },
+            { id: 'm10', name: 'Khai Klinger', role: 'Maternal Great Elder', years: '1888 – 1964', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=300', bio: 'Musician and harpist whose songs echoed across generations.', x: 1100, y: 220 },
+            { id: 'm11', name: 'Mai Chi Klingler', role: 'Maternal Grandfather', years: '1912 – 1988', avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=300', bio: 'Master woodcarver who fashioned enchanted furniture.', x: 1080, y: 560 },
+            { id: 'm12', name: 'Andreas Klingler', role: 'Maternal Grandmother', years: '1918 – 1995', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=300', bio: 'Herbalist who prepared remedies from tree bark.', x: 1220, y: 400 },
+            { id: 'm13', name: 'Ngô Văn Hoàng', role: 'Matriarch Line', years: '1948 – 2021', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300', bio: 'Artist who painted portraits of the family tree.', x: 900, y: 720 },
+            { id: 'm14', name: 'Xuân Vy', role: 'Matriarch Line', years: 'b. 1978', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=300', bio: 'Protector of the garden and heritage chronicles.', x: 820, y: 920 },
+            { id: 'm15', name: 'Kim Ngân', role: 'Next Generation', years: 'b. 2010', avatar: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&q=80&w=300', bio: 'Young explorer of the northern forests.', x: 600, y: 1100 },
+            { id: 'm16', name: 'Bé Gạo', role: 'Next Generation', years: 'b. 2012', avatar: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&q=80&w=300', bio: 'Curious about the stars and ancient myths.', x: 800, y: 1100 },
+            { id: 'm17', name: 'Bông Cải', role: 'Next Generation', years: 'b. 2015', avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=300', bio: 'Loves to paint and write stories about the family.', x: 700, y: 1150 },
+            { id: 'm18', name: 'Bé Mịch', role: 'Next Generation', years: 'b. 2018', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=300', bio: 'Enjoys exploring the hidden groves and streams.', x: 900, y: 1150 }
         ];
 
         // Relationships dataset with connecting strings & photo montages
@@ -648,22 +657,6 @@
                 story: 'Passing down compasses and mountain maps across the rugged northern valleys.',
                 photos: [
                     { title: 'Woodworking Workshop', date: 'Autumn 1925', url: 'https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&q=80&w=600' }
-                ]
-            },
-            {
-                id: 'r3', source: 'm3', target: 'm4', type: 'Spousal Union',
-                label: 'Grandparents Bond',
-                story: 'Fifty golden years spent expanding the oak garden and raising vibrant children.',
-                photos: [
-                    { title: 'Golden Anniversary', date: 'June 1970', url: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&w=600' }
-                ]
-            },
-            {
-                id: 'r4', source: 'm3', target: 'm5', type: 'Direct Lineage',
-                label: 'Father & Son',
-                story: 'Architectural mentorship that shaped timber sanctuaries.',
-                photos: [
-                    { title: 'Building the Cabin', date: 'Summer 1962', url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=600' }
                 ]
             },
             {
@@ -714,7 +707,15 @@
                 photos: [
                     { title: 'Family Gathering', date: 'May 1920', url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=600' }
                 ]
-            }
+            },
+            {
+                id: 'r11', source: 'm1', target: 'm5', type: 'Direct Lineage',
+                label: 'Mother & Son',
+                story: 'Nguyễn Thị Phương Trang guiding Nguyễn Phương Đại through the early years of his life, instilling values and wisdom.',
+                photos: [
+                    { title: 'Early Childhood', date: 'Summer 1950', url: 'https://images.unsplash.com/photo-1509114397022-ed747cca3f65?auto=format&fit=crop&q=80&w=600' }
+                ]
+            },
         ];
 
         let activeRelId = null;
@@ -731,13 +732,16 @@
         let startX = 0, startY = 0;
 
         function updateTransform(smooth = true) {
+            viewport.style.transformOrigin = '0 0';
             if (!smooth) viewport.classList.add('dragging');
             else viewport.classList.remove('dragging');
-            viewport.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+            viewport.style.transform = `translate3d(${panX}px, ${panY}px, 0px) scale(${scale})`;
+            document.getElementById('zoom-reset').textContent = `${Math.round(scale * 100)}%`;
         }
         updateTransform(true);
 
         wrapper.addEventListener('pointerdown', (e) => {
+            if (e.target.closest('button')) return;
             if (e.target.closest('.member-oval-frame') || e.target.closest('.magic-string-badge')) return;
             isDragging = true;
             startX = e.clientX - panX;
@@ -765,6 +769,22 @@
             updateTransform(true);
             playMagicTone(600, 0.3);
         }
+
+        function zoomCanvas(factor) {
+            const nextScale = Math.min(1.8, Math.max(0.35, scale * factor));
+            const centerX = wrapper.clientWidth / 2;
+            const centerY = wrapper.clientHeight / 2;
+            const scaleRatio = nextScale / scale;
+
+            panX = centerX - (centerX - panX) * scaleRatio;
+            panY = centerY - (centerY - panY) * scaleRatio;
+            scale = nextScale;
+            updateTransform(true);
+        }
+
+        document.getElementById('zoom-in').addEventListener('click', () => zoomCanvas(1.2));
+        document.getElementById('zoom-out').addEventListener('click', () => zoomCanvas(1 / 1.2));
+        document.getElementById('zoom-reset').addEventListener('click', resetCanvasView);
 
         // Render Connecting Threads & Oval Member Frame Nodes
         function renderTree() {
@@ -839,7 +859,7 @@
                 node.onclick = () => openMemberProfile(m.id);
 
                 node.innerHTML = `
-                    <div class="w-12 h-14 rounded-full border border-mythic-darkGold overflow-hidden shadow-inner mb-1 bg-amber-100/50">
+                    <div class="w-20 h-20 rounded-full border border-mythic-darkGold overflow-hidden shadow-inner mb-1 bg-amber-100/50">
                         <img src="${m.avatar}" class="w-full h-full object-cover">
                     </div>
                     <h4 class="font-fantasy font-bold text-[10px] text-slate-900 leading-none truncate w-full">${m.name}</h4>
